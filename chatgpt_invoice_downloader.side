@@ -1,0 +1,78 @@
+{
+  "id": "3cdc6914-95ce-403d-be0a-4f8cb467995b",
+  "version": "2.0",
+  "name": "chatgpt_invoice_downloader",
+  "url": "https://chatgpt.com",
+  "tests": [{
+    "id": "62187a75-de11-4885-87ed-6f3321d826dc",
+    "name": "first_test",
+    "commands": [{
+      "id": "cda4636e-21cb-4139-aad2-60fb27a95397",
+      "comment": "",
+      "command": "open",
+      "target": "/#pricing",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "63163260-0a98-45fb-a120-bd864acd42ee",
+      "comment": "",
+      "command": "//click",
+      "target": "css=.rounded-sm",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "bceece77-cdd1-44d9-8f75-42999e297fef",
+      "comment": "",
+      "command": "//click",
+      "target": "id=radix-:r4:",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a0623959-bb6c-4eb3-9892-6bc3a5c16e72",
+      "comment": "",
+      "command": "//click",
+      "target": "css=.m-1\\.5:nth-child(1)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "57bf900b-68fd-4969-9784-25a741741643",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Manage my subscription",
+      "targets": [
+        ["linkText=Manage my subscription", "linkText"],
+        ["css=.relative > div:nth-child(1) > .px-2", "css:finder"],
+        ["xpath=//a[contains(text(),'Manage my subscription')]", "xpath:link"],
+        ["xpath=//div[@id='radix-:r4o:']/div/div/div[2]/div/div[4]/div/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/#')]", "xpath:href"],
+        ["xpath=//div[4]/div/a", "xpath:position"],
+        ["xpath=//a[contains(.,'Manage my subscription')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "6b223f40-1895-4be1-a115-d54d305bb0db",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//a[contains(@href,'acct_')])[1]",
+      "targets": [
+        ["css=.as4", "css:finder"],
+        ["xpath=//body[@id='customer_portal_page_body']/div[5]/div[3]/div/span[2]/div/div/div/div/div[2]/div/div/div[2]/div/div[2]/div/div/div[4]/div/div[2]/div", "xpath:idRelative"],
+        ["xpath=//div[4]/div/div[2]/div", "xpath:position"]
+      ],
+      "value": "",
+      "opensWindow": true,
+      "windowHandleName": "win8972",
+      "windowTimeout": 2000
+    }]
+  }],
+  "suites": [{
+    "id": "f7a420f4-9561-422a-9194-00cc2782ec49",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["62187a75-de11-4885-87ed-6f3321d826dc"]
+  }],
+  "urls": ["https://chatgpt.com/"],
+  "plugins": []
+}
