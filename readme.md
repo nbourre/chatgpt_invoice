@@ -25,6 +25,21 @@
    ```
 7. Run the script
    ```bash
-   python main.py
+   python fetch_gpt_receipt.py
    ```
 
+# Usage
+```bash
+usage: fetch_gpt_receipt.py [-h] [--output_dir OUTPUT_DIR] [--filename FILENAME] [--username USERNAME] [--password PASSWORD] [--headless]
+
+Download ChatGPT receipts.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --output_dir OUTPUT_DIR
+                        Directory to save the PDF files (default: saved_pdfs)
+  --filename FILENAME   Filename for the PDF receipt (default: None)
+  --username USERNAME   Username for ChatGPT login (default: None)
+  --password PASSWORD   Password for ChatGPT login (default: None)
+  --headless            Run browser in headless mode (default: False)
+```

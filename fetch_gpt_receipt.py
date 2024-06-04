@@ -127,7 +127,8 @@ def extract_invoice_details(pdf_path):
 
 def main():
     # Argument parsing
-    parser = argparse.ArgumentParser(description="Download ChatGPT invoices.")
+    parser = argparse.ArgumentParser(description="Download ChatGPT receipts.",
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument("--output_dir", type=str, default="saved_pdfs", help="Directory to save the PDF files")
     parser.add_argument("--filename", type=str, help="Filename for the PDF receipt")
     parser.add_argument("--username", type=str, help="Username for ChatGPT login")
