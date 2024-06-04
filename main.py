@@ -8,7 +8,12 @@ import json
 from dotenv import load_dotenv
 import os
 from datetime import date, datetime
-import pypdf
+from pdfminer.high_level import extract_text
+import logging
+
+# Set up logging
+logging.basicConfig(filename='script.log', level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 # Default time to wait for page loads
 time_to_wait = 5
@@ -84,39 +89,51 @@ def download_pdf_receipt(driver, output_dir, filename):
     return file_path
 
 def extract_invoice_details(pdf_path):
-    # Open the PDF file
-    with open(pdf_path, 'rb') as file:
-        reader = pypdf.PdfReader(file)
-        number_of_pages = len(reader.pages)
-        
-        # Extract text from each page
-        text = ""
-        for page in range(number_of_pages):
-            text += reader.pages[page].extract_text()
-    
-    # Initialize variables
-    invoice_number = None
-    date_paid = None
-    
-    # Search for invoice number and date paid patterns
-    for line in text.split('\n'):
-        if "Invoice number" in line:
-            invoice_number = line.split("Invoice number")[-1].strip()
-        elif "Date paid" in line:
-            date_str = line.split("Date paid")[-1].strip()
-            date_paid = datetime.strptime(date_str, "%b %d, %Y").date().isoformat()
-        if invoice_number and date_paid:
-            break
+    try:
+        # Extract text from the PDF file
+        text = extract_text(pdf_path)
 
-    return invoice_number, date_paid
+        # Initialize variables
+        invoice_number = None
+        date_paid = None
+
+        # Split text into lines for better processing
+        lines = text.split('\n')
+
+        # Search for invoice number and date paid patterns
+        for i, line in enumerate(lines):
+            if "Invoice number" in line:
+                # Extract invoice number from the line
+                invoice_number = line.split("Invoice number")[-1].strip()
+                
+                # Replace \x00 by "-"
+                invoice_number = invoice_number.replace("\x00", "-")
+            elif "Date paid" in line and i + 3 < len(lines):
+                # The date paid might be three lines after "Date paid"
+                date_str = lines[i + 3].strip()
+                try:
+                    date_paid = datetime.strptime(date_str, "%b %d, %Y").date().isoformat()
+                except ValueError as e:
+                    logging.error(f"Failed to parse date: {date_str} - {e}")
+                    continue
+            if invoice_number and date_paid:
+                break
+
+        return invoice_number, date_paid
+    
+    except Exception as e:
+        logging.error(f"Failed to extract invoice details: {e}")
+        return None, None
 
 def main():
     # Argument parsing
     parser = argparse.ArgumentParser(description="Download ChatGPT invoices.")
     parser.add_argument("--output_dir", type=str, default="saved_pdfs", help="Directory to save the PDF files")
-    parser.add_argument("--filename", type=str, default=date.today().strftime("%Y%m%d") + "_receipt.pdf", help="Filename for the PDF receipt")
+    parser.add_argument("--filename", type=str, help="Filename for the PDF receipt")
     parser.add_argument("--username", type=str, help="Username for ChatGPT login")
     parser.add_argument("--password", type=str, help="Password for ChatGPT login")
+    parser.add_argument("--headless", action="store_true", help="Run browser in headless mode")
+
     args = parser.parse_args()
         
     # Load environment variables from .env file
@@ -149,7 +166,8 @@ def main():
     
     # Initialize the Firefox WebDriver
     options = webdriver.FirefoxOptions()
-    # options.add_argument('--headless')  # Uncomment to run in headless mode
+    if args.headless:
+        options.add_argument('--headless')
     driver = webdriver.Firefox(options=options)
 
     try:
@@ -162,11 +180,37 @@ def main():
         open_chatgpt_homepage(driver)
         open_pricing_panel(driver)
         click_manage_subscription(driver)
-        download_pdf_receipt(driver, output_dir, args.filename)
+        
+        # Download PDF receipt
+        temp_filename = args.filename or date.today().strftime("%Y%m%d") + " - ChatGPT - Receipt.pdf"
+        pdf_path = download_pdf_receipt(driver, output_dir, temp_filename)
+        
+        # Extract invoice details
+        invoice_number, date_paid = extract_invoice_details(pdf_path)
+        print(f"Invoice number: {invoice_number}")
+        print(f"Date paid: {date_paid}")
 
+        # Rename file if no filename was provided
+        if not args.filename and invoice_number and date_paid:
+            new_filename = f"{date_paid.replace('-', '')} - {invoice_number} - ChatGPT.pdf"
+            new_file_path = os.path.join(output_dir, new_filename)
+            os.rename(pdf_path, new_file_path)
+            print(f"File renamed to: {new_filename}")        
+            
+    except Exception as e:
+        logging.error(f"Error in main function: {e}")
+        
     finally:
         # Close the WebDriver
         driver.quit()
 
+def test_extract_invoice_details():
+    # Test the PDF extraction function
+    pdf_path = "2024-06-04_invoice.pdf"
+    invoice_number, date_paid = extract_invoice_details(pdf_path)
+    print(f"Invoice number: {invoice_number}")
+    print(f"Date paid: {date_paid}")
+
 if __name__ == "__main__":
     main()
+    #test_extract_invoice_details()
