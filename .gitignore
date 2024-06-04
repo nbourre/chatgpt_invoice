@@ -208,3 +208,4 @@ pip-selfcheck.json
 
 cookies.json
 *.pdf
+saved_pdf/
