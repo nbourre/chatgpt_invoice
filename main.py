@@ -195,7 +195,10 @@ def main():
             new_filename = f"{date_paid.replace('-', '')} - {invoice_number} - ChatGPT.pdf"
             new_file_path = os.path.join(output_dir, new_filename)
             os.rename(pdf_path, new_file_path)
-            print(f"File renamed to: {new_filename}")        
+            print(f"File renamed to: {new_filename}")
+        else:
+            print("Unable to extract details from file. File not renamed.")
+            print(f"File saved as: {temp_filename}")
             
     except Exception as e:
         logging.error(f"Error in main function: {e}")
